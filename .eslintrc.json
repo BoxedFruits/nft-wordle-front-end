@@ -19,8 +19,5 @@
     "plugins": [
         "react",
         "@typescript-eslint"
-    ],
-    "rules": {
-      "arrow-body-style": ["error", "always"]
-    }
+    ]
 }
