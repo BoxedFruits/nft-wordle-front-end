@@ -1,3 +1,5 @@
+//Did not test if this works yet. Have to wait until can interact with contract
+
 //Actions
 const SET_TRANSACTION_STATUS = 'nordle/transaction/SET_TRANSACTION_STATUS'; 
 

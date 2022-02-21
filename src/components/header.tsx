@@ -4,13 +4,11 @@ import { useAppSelector } from '../app/hooks';
 import { AppDispatch } from '../configureStore';
 import { updateAddress } from '../ducks/address';
 
-// const store = createStore(AddressReducer);
 
-
+//Need to add web3 stuff
 function Header() {
   const dispatch: AppDispatch = useDispatch();
   function clicked() {
-    console.log("CLICKED");
     dispatch({...updateAddress("my New address")});
   }
   const state = useAppSelector(state => state.addressReducer.address);
