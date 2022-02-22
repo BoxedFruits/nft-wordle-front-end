@@ -1,0 +1,6 @@
+.connect-metamask {
+  width: 5.6rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
