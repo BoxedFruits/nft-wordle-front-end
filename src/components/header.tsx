@@ -2,13 +2,16 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 import { useAppSelector } from '../app/hooks';
 import { AppDispatch } from '../configureStore';
-import { updateAddress } from '../ducks/address';
+
 import MetaMaskOnboarding from '@metamask/onboarding';
+import { ethers } from "ethers";
 import './header.css';
+import { updateAddress } from '../ducks/address';
 
 const ONBOARD_TEXT = 'Click here to install MetaMask!';
 const CONNECT_TEXT = 'Connect';
 
+//TODO: Check that user is on rinkbey
 function OnboardingButton() {
   const [buttonText, setButtonText] = useState(ONBOARD_TEXT);
   const [isDisabled, setDisabled] = useState(false);
@@ -67,13 +70,10 @@ function OnboardingButton() {
   );
 }
 
-
 //Need to add web3 stuff
 //ABI
 //ContractAddress
 function Header() {
-
-
   const state = useAppSelector(state => state.addressReducer.address);
 
   return (<div>
