@@ -3,10 +3,8 @@ import Header from './components/header';
 import Nordle from './components/nordle';
 import logo from './../logo.svg';
 import './App.css';
-import { useAppSelector } from './hooks';
 
 function App() {
-  const state = useAppSelector(state => state.addressReducer.address);
   return (
     <div className="App">
       <Header />
