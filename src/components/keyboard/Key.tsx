@@ -34,7 +34,8 @@ export const Key = ({
   }
 
   return (
-    <button style={styles}  onClick={handleClick}>
+    <button className="flex items-center justify-center rounded mx-0.5 text-xs font-bold cursor-pointer select-none dark:text-white bg-slate-200 dark:bg-slate-600 hover:bg-slate-300 active:bg-slate-400" 
+      style={styles} onClick={handleClick}>
       {children || value}
     </button>
   )
