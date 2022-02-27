@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useDispatch } from 'react-redux';
-import { useAppSelector } from '../app/hooks';
+import { useAppSelector } from '../hooks';
 import { AppDispatch } from '../configureStore';
 
 import MetaMaskOnboarding from '@metamask/onboarding';
