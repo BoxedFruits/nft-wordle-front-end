@@ -13,7 +13,6 @@ export interface address {
 export const reducer = (state = initialState, action) => {
   switch (action.type) {
     case UPDATE_ADDRESS:
-      console.log("HERE?", action,state)
       return { ...state, address: action.payload.address };
     default: return state;
   }
