@@ -1,18 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
-import { contractAddress } from '../utils/constants';
+import { contractAddress, MAX_WORD_LENGTH } from '../utils/constants';
 import nordleAbi from '../utils/nordle.abi.json';
-import { useAppSelector } from '../app/hooks';
+import { useAppSelector } from '../hooks';
 import { Keyboard } from './keyboard/Keyboard';
 import { default as GraphemeSplitter } from 'grapheme-splitter'
+import { Grid } from './grid/Grid';
 
 //Need to show error message if at max tries or already solved
 //Disable input?
 const Nordle = () => {
   const [currentGuess, setCurrentGuess] = useState('')
   const [isRevealing, setIsRevealing] = useState(false)
+  const [currentToken, setCurrentToken] = useState();
+
+  const web3Provider = new ethers.providers.Web3Provider(window.ethereum);
+  const nordleContract = new ethers.Contract(contractAddress, nordleAbi.abi, web3Provider.getSigner());
+  const userWalletAddress = useAppSelector(state => state.addressReducer.address);
+
   const onChar = (value: string) => {
-    setCurrentGuess(`${currentGuess}${value}`)
+    if ( currentGuess.length + 1 <= MAX_WORD_LENGTH ) {
+      setCurrentGuess(`${currentGuess}${value}`)
+    }
   }
 
   const onDelete = () => {
@@ -24,10 +33,6 @@ const Nordle = () => {
   const onEnter = () => {
     //Submit TX and check status
   }
-  const [currentToken, setCurrentToken] = useState();
-  const web3Provider = new ethers.providers.Web3Provider(window.ethereum);
-  const nordleContract = new ethers.Contract(contractAddress, nordleAbi.abi, web3Provider.getSigner());
-  const userWalletAddress = useAppSelector(state => state.addressReducer.address);
 
   const getCurrentToken = async () => {
     try {
@@ -38,18 +43,14 @@ const Nordle = () => {
       console.log(e);
     }
   }
-  console.log(userWalletAddress)
 
-  console.log(currentToken);
-  // console.log(currentToken().then((r) => console.log(r)));
 
-  //Retrive the NFT from etherscan
-  //Input box
-  //Show input dynamically
+  //TODO: Retrive the NFT from etherscan
+  //TODO: Send transaction when submit and update thing
   return (
     <div>
-      this is nordle
       <div>
+        <Grid currentGuess={currentGuess} />
         <button onClick={() => getCurrentToken()}>this is a test</button>
         <button onClick={() => nordleContract.guessWord('LLLLLL')}>interaction or something</button>
         <Keyboard onChar={onChar}
