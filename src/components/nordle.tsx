@@ -6,20 +6,23 @@ import { useAppSelector } from '../hooks';
 import { Keyboard } from './keyboard/Keyboard';
 import { default as GraphemeSplitter } from 'grapheme-splitter'
 import { Grid } from './grid/Grid';
-import { useStore } from 'react-redux';
-import { RootState } from '../configureStore';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../configureStore';
+import { setTransactionStatus } from '../ducks/transactionStatus';
 
 //TODO: Need to show error message if at max tries or already solved
 //Disable input?
 const Nordle = () => {
   const [currentGuess, setCurrentGuess] = useState('')
   const [isRevealing, setIsRevealing] = useState(false)
-  const [currentToken, setCurrentToken] = useState<BigNumber>();
+  const [currentToken, setCurrentToken] = useState<number>();
   const [currentTokenUri, setCurrentTokenUri] = useState<string>();
 
   const web3Provider = new ethers.providers.Web3Provider(window.ethereum);
   const nordleContract = new ethers.Contract(contractAddress, nordleAbi.abi, web3Provider.getSigner());
   const userWalletAddress = useAppSelector(state => state.addressReducer.address);
+  const isTransactionPending = useAppSelector(state => state.transactionStatusReducers.transactionStatus);
+  const dispatch: AppDispatch = useDispatch();
 
   useEffect(() => {
     if (userWalletAddress !== '') {
@@ -28,10 +31,15 @@ const Nordle = () => {
   }, [userWalletAddress])
 
   useEffect(() => {
-    if (currentToken !== undefined) {
+    if (currentToken !== 0 && currentToken !== undefined && isTransactionPending !== true) {
       getCurrentTokenURI();
     }
-  }, [currentToken])
+  }, [currentToken, isTransactionPending])
+
+  useEffect(() => {
+    //show transaction modal thing
+    console.log("TRANSACTION STATE", isTransactionPending)
+  }, [isTransactionPending]);
 
   const onChar = (value: string) => {
     if (currentGuess.length + 1 <= MAX_WORD_LENGTH) {
@@ -45,15 +53,40 @@ const Nordle = () => {
     )
   }
 
-  const onEnter = () => {
-    //Submit TX
-    //Re-render the new tokenURI
+  const onEnter = async () => {
+
+    //TODO: Implement this in the future. check tries
+    // if (isGameWon || isGameLost) {
+    //   return
+    // }
+
+    // Implement something similar in the future
+    // if (!(unicodeLength(currentGuess) === MAX_WORD_LENGTH)) {
+    //   setCurrentRowClass('jiggle')
+    //   return showErrorAlert(NOT_ENOUGH_LETTERS_MESSAGE, {
+    //     onClose: clearCurrentRowClass,
+    //   })
+    // }
+    if (currentGuess.length === MAX_WORD_LENGTH) {
+      console.log("SUBMITTING", currentGuess);
+      // ===TODO===
+      //Show loading icon until the tx confirms
+      //Clear input
+
+      try {
+        const tx = await nordleContract.guessWord(currentGuess);
+        dispatch({ ...setTransactionStatus(true) })
+        await tx.wait();
+        dispatch({ ...setTransactionStatus(false) })
+      } catch (e) {
+        console.log("Error submitting the transaction:", e)
+      }
+    }
   }
 
   const getCurrentToken = async () => {
     try {
-      console.log(userWalletAddress)
-      setCurrentToken(await nordleContract.currentToken(userWalletAddress));
+      setCurrentToken((await nordleContract.currentToken(userWalletAddress)).toNumber());
     } catch (e) {
       console.log("Error getting the token:", e);
     }
@@ -61,7 +94,7 @@ const Nordle = () => {
 
   const getCurrentTokenURI = async () => {
     try {
-      const tokenUri = await nordleContract.tokenURI(currentToken.toNumber())
+      const tokenUri = await nordleContract.tokenURI(currentToken)
       setCurrentTokenUri(JSON.parse(atob(tokenUri.slice(tokenUri.indexOf(",") + 1))).image)
       console.log(tokenUri)
     } catch (e) {
@@ -72,16 +105,15 @@ const Nordle = () => {
   return (
     <div>
       <div>
-        <img style={{marginBottom: currentTokenUri !== undefined ? "-70rem": ""}} src={currentTokenUri}></img>
-        <Grid currentGuess={currentGuess} />
-        <button onClick={() => getCurrentToken()}>this is a test</button>
-        <button onClick={() => getCurrentTokenURI()}>get tokenURI</button>
-        <button onClick={() => nordleContract.guessWord('LLLLLL')}>interaction or something</button>
-        <Keyboard onChar={onChar}
-          onDelete={onDelete}
-          onEnter={onEnter}
-          guesses={"1"}
-          isRevealing={isRevealing}></Keyboard>
+        <img src={currentTokenUri}></img>
+        <div style={{ marginTop: "-40%" }}>
+          <Grid currentGuess={currentGuess} />
+          <Keyboard onChar={onChar}
+            onDelete={onDelete}
+            onEnter={onEnter}
+            guesses={"1"}
+            isRevealing={isRevealing}></Keyboard>
+        </div>
       </div>
     </div>);
 }
