@@ -77,8 +77,7 @@ function Header() {
   const state = useAppSelector(state => state.addressReducer.address);
 
   return (<div>
-    This is my header
-    <button onClick={() => {console.log(state)}}> get state</button>
+    {/* <button onClick={() => {console.log(state)}}> get state</button> */}
     <OnboardingButton></OnboardingButton>
   </div>);
 }
